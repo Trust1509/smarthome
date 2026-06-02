@@ -1,0 +1,6 @@
+.DS_Store
+*.env
+secrets.yaml
+node_modules/
+__pycache__/
+config.json

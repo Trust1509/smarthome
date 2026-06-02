@@ -1,0 +1,23 @@
+alias: Somfy → Loxone MQTT Publish
+description: Publiziert Somfy Rollladen Status bei Änderung
+mode: single
+max_exceeded: silent
+triggers:
+  - trigger: state
+    entity_id:
+      - cover.espsomfyrts_1
+      - cover.espsomfyrts_2
+      - cover.espsomfyrts_3
+      - cover.espsomfyrts_4
+      - cover.espsomfyrts_5
+      - cover.espsomfyrts_6
+      - cover.espsomfyrts_7
+      - cover.espsomfyrts_8
+conditions: []
+actions:
+  - action: mqtt.publish
+    data:
+      topic: lox/Somfy
+      retain: false
+      payload: >-
+        1:State:{% if is_state('cover.espsomfyrts_1','open') %}1{% elif is_state('cover.espsomfyrts_1','closed') %}0{% elif is_state('cover.espsomfyrts_1','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_1','current_position') | int(0) }}|2:State:{% if is_state('cover.espsomfyrts_2','open') %}1{% elif is_state('cover.espsomfyrts_2','closed') %}0{% elif is_state('cover.espsomfyrts_2','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_2','current_position') | int(0) }}|3:State:{% if is_state('cover.espsomfyrts_3','open') %}1{% elif is_state('cover.espsomfyrts_3','closed') %}0{% elif is_state('cover.espsomfyrts_3','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_3','current_position') | int(0) }}|4:State:{% if is_state('cover.espsomfyrts_4','open') %}1{% elif is_state('cover.espsomfyrts_4','closed') %}0{% elif is_state('cover.espsomfyrts_4','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_4','current_position') | int(0) }}|5:State:{% if is_state('cover.espsomfyrts_5','open') %}1{% elif is_state('cover.espsomfyrts_5','closed') %}0{% elif is_state('cover.espsomfyrts_5','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_5','current_position') | int(0) }}|6:State:{% if is_state('cover.espsomfyrts_6','open') %}1{% elif is_state('cover.espsomfyrts_6','closed') %}0{% elif is_state('cover.espsomfyrts_6','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_6','current_position') | int(0) }}|7:State:{% if is_state('cover.espsomfyrts_7','open') %}1{% elif is_state('cover.espsomfyrts_7','closed') %}0{% elif is_state('cover.espsomfyrts_7','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_7','current_position') | int(0) }}|8:State:{% if is_state('cover.espsomfyrts_8','open') %}1{% elif is_state('cover.espsomfyrts_8','closed') %}0{% elif is_state('cover.espsomfyrts_8','opening') %}2{% else %}3{% endif %};Pos:{{ 100 - state_attr('cover.espsomfyrts_8','current_position') | int(0) }}

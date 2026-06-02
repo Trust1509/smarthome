@@ -1,0 +1,31 @@
+alias: EP2 → Loxone MQTT Publish
+description: Publiziert bei Wertänderung, Fallback alle 59 Sek
+mode: single
+max_exceeded: silent
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.ep2tv_energy_power
+      - sensor.ep2dreame_energy_power
+      - sensor.ep2mikrowelle_energy_power
+      - sensor.ep2pool_energy_power
+      - sensor.ep2_bwwp_energy_power
+      - sensor.ep2nwsdabo_energy_power
+      - sensor.ep2backrohr_energy_power
+      - switch.ep2tv
+      - switch.ep2dreame
+      - switch.ep2mikrowelle
+      - switch.ep2pool
+      - switch.ep2_bwwp
+      - switch.ep2nwsdabo
+      - switch.ep2backrohr
+  - trigger: time_pattern
+    seconds: /59
+conditions: []
+actions:
+  - action: mqtt.publish
+    data:
+      topic: lox/Tasmota
+      retain: false
+      payload: >-
+        EP2TV:Power:{{ states('sensor.ep2tv_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2tv','on') else 0 }};Total:{{ states('sensor.ep2tv_energy_total') | float(0) | round(3) }}|EP2Dreame:Power:{{ states('sensor.ep2dreame_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2dreame','on') else 0 }};Total:{{ states('sensor.ep2dreame_energy_total') | float(0) | round(3) }}|EP2Mikrowelle:Power:{{ states('sensor.ep2mikrowelle_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2mikrowelle','on') else 0 }};Total:{{ states('sensor.ep2mikrowelle_energy_total') | float(0) | round(3) }}|EP2Pool:Power:{{ states('sensor.ep2pool_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2pool','on') else 0 }};Total:{{ states('sensor.ep2pool_energy_total') | float(0) | round(3) }}|EP2BWWP:Power:{{ states('sensor.ep2_bwwp_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2_bwwp','on') else 0 }};Total:{{ states('sensor.ep2_bwwp_energy_total') | float(0) | round(3) }}|EP2NWSDaBo:Power:{{ states('sensor.ep2nwsdabo_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2nwsdabo','on') else 0 }};Total:{{ states('sensor.ep2nwsdabo_energy_total') | float(0) | round(3) }}|EP2Backrohr:Power:{{ states('sensor.ep2backrohr_energy_power') | int(0) }};State:{{ 1 if is_state('switch.ep2backrohr','on') else 0 }};Total:{{ states('sensor.ep2backrohr_energy_total') | float(0) | round(3) }}

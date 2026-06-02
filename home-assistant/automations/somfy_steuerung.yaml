@@ -1,0 +1,62 @@
+alias: Loxone → Somfy Steuerung
+description: Steuert Somfy Rollladen via lox/Somfy/set
+triggers:
+  - trigger: mqtt
+    topic: lox/Somfy/set
+conditions: []
+actions:
+  - variables:
+      payload: "{{ trigger.payload | from_json }}"
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ payload.cmd == 'Up' }}"
+        sequence:
+          - repeat:
+              for_each: "{{ payload.shades }}"
+              sequence:
+                - action: cover.open_cover
+                  target:
+                    entity_id: cover.espsomfyrts_{{ repeat.item }}
+                - delay:
+                    milliseconds: 500
+      - conditions:
+          - condition: template
+            value_template: "{{ payload.cmd == 'Down' }}"
+        sequence:
+          - repeat:
+              for_each: "{{ payload.shades }}"
+              sequence:
+                - action: cover.close_cover
+                  target:
+                    entity_id: cover.espsomfyrts_{{ repeat.item }}
+                - delay:
+                    milliseconds: 500
+      - conditions:
+          - condition: template
+            value_template: "{{ payload.cmd == 'Stop' }}"
+        sequence:
+          - repeat:
+              for_each: "{{ payload.shades }}"
+              sequence:
+                - action: cover.stop_cover
+                  target:
+                    entity_id: cover.espsomfyrts_{{ repeat.item }}
+                - delay:
+                    milliseconds: 500
+      - conditions:
+          - condition: template
+            value_template: "{{ payload.cmd == 'Position' }}"
+        sequence:
+          - repeat:
+              for_each: "{{ payload.shades.keys() | list }}"
+              sequence:
+                - action: cover.set_cover_position
+                  target:
+                    entity_id: cover.espsomfyrts_{{ repeat.item }}
+                  data:
+                    position: "{{ payload.shades[repeat.item] | int(0) }}"
+                - delay:
+                    milliseconds: 500
+mode: queued
+max: 10

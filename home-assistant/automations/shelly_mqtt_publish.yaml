@@ -1,0 +1,26 @@
+alias: Shelly → Loxone MQTT Publish
+description: Publiziert bei Wertänderung, Fallback alle 59 Sek
+mode: single
+max_exceeded: silent
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.luftung_leistung
+      - sensor.kochfeld_links_leistung
+      - sensor.kochfeld_rechts_leistung
+      - sensor.sauger_pm_leistung
+      - sensor.wp_phase_a_leistung
+      - sensor.wp_phase_b_leistung
+      - sensor.wp_phase_c_leistung
+      - sensor.pm_ac_az_manu_leistung
+      - sensor.pm_ac_l_sz_gz_leistung
+  - trigger: time_pattern
+    seconds: /59
+conditions: []
+actions:
+  - action: mqtt.publish
+    data:
+      topic: lox/Shelly
+      retain: false
+      payload: >-
+        Lueftung:Power:{{ states('sensor.luftung_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.luftung_energieeinspeisung') | float(0) | round(3) }}|KochfeldL:Power:{{ states('sensor.kochfeld_links_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.kochfeld_links_energieeinspeisung') | float(0) | round(3) }}|KochfeldR:Power:{{ states('sensor.kochfeld_rechts_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.kochfeld_rechts_energieeinspeisung') | float(0) | round(3) }}|Sauger:Power:{{ states('sensor.sauger_pm_leistung') | float(0) | round(1) }};Total:{{ states('sensor.sauger_pm_energie') | float(0) | round(3) }}|WP_A:Power:{{ states('sensor.wp_phase_a_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.wp_phase_a_energieeinspeisung') | float(0) | round(3) }}|WP_B:Power:{{ states('sensor.wp_phase_b_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.wp_phase_b_energieeinspeisung') | float(0) | round(3) }}|WP_C:Power:{{ states('sensor.wp_phase_c_leistung') | float(0) | abs | round(1) }};Total:{{ states('sensor.wp_phase_c_energieeinspeisung') | float(0) | round(3) }}|PM_AZ:Power:{{ states('sensor.pm_ac_az_manu_leistung') | float(0) | round(1) }};Total:{{ states('sensor.pm_ac_az_manu_energie') | float(0) | round(3) }}|PM_SZGZ:Power:{{ states('sensor.pm_ac_l_sz_gz_leistung') | float(0) | round(1) }};Total:{{ states('sensor.pm_ac_l_sz_gz_energie') | float(0) | round(3) }}

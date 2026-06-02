@@ -1,0 +1,42 @@
+# Adjust entity IDs to match your Home Assistant integration names.
+# Zone names (Zone1–Zone7) are placeholders — replace with your own HA zone names.
+# Zone 0 = not_home, Zone 9 = unknown location.
+alias: EV → Loxone MQTT Status Publish
+description: Publishes EV status (Car1 + Car2) to Loxone every 59 seconds
+mode: single
+triggers:
+  - trigger: time_pattern
+    seconds: /59
+conditions: []
+actions:
+  - action: mqtt.publish
+    data:
+      topic: Z2M/lox/EV
+      retain: true
+      payload: >-
+        Car1:SoC:{{ states('sensor.ioniq_5_ev_battery_level') | int(0) }};Range:{{
+        states('sensor.ioniq_5_ev_range') | int(0) }};Plugged:{{ 1 if
+        is_state('binary_sensor.ioniq_5_ev_battery_plug','on') else 0
+        }};Charging:{{ 1 if
+        is_state('binary_sensor.ioniq_5_ev_battery_charge','on') else 0
+        }};Climate:{{ 1 if is_state('switch.ioniq_5_climate','on') else 0
+        }};Zone:{% set s = states('device_tracker.ioniq_5_location') %}{% if s
+        == 'home' %}1{% elif s == 'Zone1' %}2{% elif s == 'Zone2' %}3{% elif
+        s == 'Zone3' %}4{% elif s == 'Zone4' %}5{% elif s ==
+        'Zone5' %}6{% elif s == 'Zone6' %}7{% elif s == 'Zone7' %}8{% elif s
+        == 'not_home' %}0{% else %}9{% endif %}
+  - action: mqtt.publish
+    data:
+      topic: Z2M/lox/EV
+      retain: true
+      payload: >-
+        Car2:SoC:{{ states('sensor.batterie') | int(0) }};Range:{{
+        states('sensor.batteriereichweite') | int(0) }};Plugged:{{ 1 if
+        is_state('binary_sensor.stecker','on') else 0 }};Charging:{{ 1 if
+        is_state('binary_sensor.ladestatus','on') else 0 }};Climate:{{ 1 if
+        is_state('binary_sensor.hlk','on') else 0 }};Zone:{% set s =
+        states('device_tracker.standort') %}{% if s == 'home' %}1{% elif s ==
+        'Zone1' %}2{% elif s == 'Zone2' %}3{% elif s == 'Zone3' %}4{% elif
+        s == 'Zone4' %}5{% elif s == 'Zone5' %}6{% elif s == 'Zone6'
+        %}7{% elif s == 'Zone7' %}8{% elif s == 'not_home' %}0{% else %}9{%
+        endif %}

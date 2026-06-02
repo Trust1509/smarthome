@@ -1,0 +1,31 @@
+{
+  "unifi": {
+    "host": "YOUR_UDM_IP",
+    "api_key": "YOUR_UNIFI_API_KEY",
+    "site_id": "YOUR_SITE_ID"
+  },
+  "mqtt": {
+    "host": "YOUR_MQTT_BROKER_IP",
+    "port": 1883,
+    "user": "your_mqtt_user",
+    "pass": "your_mqtt_password",
+    "topic": "lox/Presence"
+  },
+  "interval": 60,
+  "force_publish_interval": 300,
+  "devices": [
+    {
+      "name": "Person1",
+      "macs": [
+        "aa:bb:cc:dd:ee:ff",
+        "11:22:33:44:55:66"
+      ]
+    },
+    {
+      "name": "Person2",
+      "macs": [
+        "aa:bb:cc:dd:ee:ff"
+      ]
+    }
+  ]
+}
