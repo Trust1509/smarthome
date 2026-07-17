@@ -62,16 +62,18 @@ All devices are always included in every message (not just changed ones), so Lox
 
 ### `pico_scripts/somfy_position.c`
 
-Reads up to 8 analog inputs (0–100%) representing shutter positions from ESPSomfy-RTS, inverts the coordinate system (Loxone: 0 = open, 100 = closed vs. ESPSomfy: 0 = closed, 100 = open), and publishes a JSON change-set whenever any position changes.
+Reads up to 8 analog inputs (0–100), each wired to the **TPos (target position)** output of a Loxone automatic-shading block, inverts the coordinate system (Loxone: 0 = open, 100 = closed vs. ESPSomfy: 0 = closed, 100 = open), and publishes a JSON change-set whenever a target position changes.
 
 **Output format:**
 ```json
 {"cmd":"Position","shades":{"1":30,"3":80}}
 ```
 
-Only shades that changed since the last cycle are included — this minimises MQTT publish usage. On startup all 8 positions are published once to sync state.
+Only shades that changed since the last cycle are included — this minimises MQTT publish usage.
 
-**Inputs:** Analog inputs 0–7 (shutter position 0–100 from ESPSomfy-RTS Virtual Inputs)
+**Restart behaviour (important with RTS):** Somfy RTS is one-way — ESPSomfy has no position feedback and estimates intermediate positions by run-time, which drifts. On startup the script therefore seeds its baseline from the current TPos inputs **without** publishing, so a Miniserver/Pico restart does **not** re-command every shade. Re-commanding on every restart would make the estimated positions drift further each time (shades ending up fully closed instead of at their target). Full open/close (TPos 0 or 100) always hits the physical end stop and stays reliable.
+
+**Inputs:** Analog inputs 0–7 (TPos output of each shading block, 0–100)
 
 **Output:** Text output 0 → connect to a Virtual Output (MQTT publish to `lox/Somfy/set`)
 

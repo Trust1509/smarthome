@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.1.1] - 2026-06-27
+### Fixed
+- Somfy Pico-C script no longer re-commands all shades after a Miniserver/Pico restart. It now seeds its baseline from the current TPos inputs without publishing, then only sends genuine changes. Previously every restart re-sent all 8 positions, and because RTS has no position feedback the estimated moves drifted further with each restart (shades ending up fully closed instead of at their target).
+
+---
+
 ## [1.1.0] - 2026-06-02
 ### Added
 - UniFi presence detection (`unifi-presence/`): bundles all person states into single MQTT topic `lox/Presence`
