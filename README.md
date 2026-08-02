@@ -2,6 +2,8 @@
 
 Smart Home automation code integrating Loxone, Zigbee2MQTT, and Home Assistant.
 
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_me_a_coffee-support-FFDD00?logo=buymeacoffee&logoColor=000000)](https://buymeacoffee.com/trust1509)
+
 > This project was vibe coded with [Claude Sonnet 4.6](https://www.anthropic.com/claude) by Anthropic.
 
 **License:** CC BY-NC 4.0 - Free for personal/non-commercial use. Attribution required. Commercial use prohibited.
@@ -108,6 +110,12 @@ See the README in each subfolder for deployment instructions:
 - [zigbee2mqtt/README.md](zigbee2mqtt/README.md)
 - [home-assistant/README.md](home-assistant/README.md)
 - [loxone/README.md](loxone/README.md)
+
+---
+
+## Support
+
+I build and maintain open-source tools for self-hosted software. If this project helps you, consider [buying me a coffee](https://buymeacoffee.com/trust1509) to support continued development and maintenance.
 
 ---
 
