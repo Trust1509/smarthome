@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0] - 2026-11-26
+### Added
+- Waste collection for Loxone: HA automation `waste_collection_loxone.yaml` writes the next collection dates from a Local Calendar into Loxone virtual text inputs (one tile per waste type plus a today/tomorrow status) and triggers a Loxone push at 18:00 (tomorrow) and 06:00 (today)
+- `home-assistant/waste-calendar/waste_calendar.py`: yearly import of an Excel collection plan into the HA Local Calendar ICS (`compare` to find the column mapping, `build` with duplicate, year and PDF cross-checks); column mapping in an ignored `config.json`
+
+---
+
 ## [1.1.1] - 2026-06-27
 ### Fixed
 - Somfy Pico-C script no longer re-commands all shades after a Miniserver/Pico restart. It now seeds its baseline from the current TPos inputs without publishing, then only sends genuine changes. Previously every restart re-sent all 8 positions, and because RTS has no position feedback the estimated moves drifted further with each restart (shades ending up fully closed instead of at their target).

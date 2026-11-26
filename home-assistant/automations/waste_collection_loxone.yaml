@@ -1,0 +1,109 @@
+id: muellabfuhr_loxone
+alias: Müllabfuhr → Loxone
+description: Writes the next waste collection dates from a HA calendar into Loxone virtual text inputs (one tile per waste
+  type plus a today/tomorrow status) and triggers a Loxone push at 18:00 (tomorrow) and 06:00 (today).
+triggers:
+- trigger: time
+  at: '00:05:00'
+  id: nacht
+- trigger: time
+  at: '06:00:00'
+  id: frueh
+- trigger: time
+  at: '18:00:00'
+  id: abend
+- trigger: homeassistant
+  event: start
+  id: start
+conditions: []
+actions:
+- if:
+  - condition: template
+    value_template: '{{ (trigger.id | default('''')) == ''start'' }}'
+  then:
+  - delay:
+      seconds: 90
+- action: calendar.get_events
+  target:
+    entity_id: calendar.mullabfuhr
+  data:
+    start_date_time: '{{ today_at(''00:00'') }}'
+    duration:
+      days: 120
+  response_variable: kal
+- variables:
+    arten:
+      Restmüll: <LOXONE_UUID_RESTMUELL>
+      Biotonne: <LOXONE_UUID_BIOTONNE>
+      Windeltonne: <LOXONE_UUID_WINDELTONNE>
+      Gelber Sack: <LOXONE_UUID_GELBER_SACK>
+      Altpapier: <LOXONE_UUID_ALTPAPIER>
+    termine: '{{ kal[''calendar.mullabfuhr''].events }}'
+- variables:
+    lage: |-
+      {% set heute = now().date() %}
+      {% set tage = ['Mo','Di','Mi','Do','Fr','Sa','So'] %}
+      {% set ns = namespace(kacheln=[], heute=[], morgen=[]) %}
+      {% set liste = termine | sort(attribute='start') %}
+      {% for e in liste %}
+        {% set art = e.summary | replace('🗑', '') | trim %}
+        {% set d = as_datetime(e.start).date() %}
+        {% if d == heute and art not in ns.heute %}{% set ns.heute = ns.heute + [art] %}{% endif %}
+        {% if (d - heute).days == 1 and art not in ns.morgen %}{% set ns.morgen = ns.morgen + [art] %}{% endif %}
+      {% endfor %}
+      {% for art, uid in arten.items() %}
+        {% set nx = namespace(d=none) %}
+        {% for e in liste %}
+          {% if nx.d is none and (e.summary | replace('🗑', '') | trim) == art %}
+            {% set nx.d = as_datetime(e.start).date() %}
+          {% endif %}
+        {% endfor %}
+        {% if nx.d is none %}
+          {% set txt = 'kein Termin' %}
+        {% else %}
+          {% set n = (nx.d - heute).days %}
+          {% set datum = tage[nx.d.weekday()] ~ ' ' ~ nx.d.strftime('%d.%m.') %}
+          {% if n == 0 %}{% set txt = 'Heute (' ~ datum ~ ')' %}
+          {% elif n == 1 %}{% set txt = 'Morgen (' ~ datum ~ ')' %}
+          {% else %}{% set txt = datum ~ ' (in ' ~ n ~ ' Tagen)' %}{% endif %}
+        {% endif %}
+        {% set ns.kacheln = ns.kacheln + [{'uuid': uid, 'text': txt}] %}
+      {% endfor %}
+      {% set teile = [] %}
+      {% if ns.heute %}{% set teile = teile + ['Heute: ' ~ (ns.heute | join(', '))] %}{% endif %}
+      {% if ns.morgen %}{% set teile = teile + ['Morgen: ' ~ (ns.morgen | join(', '))] %}{% endif %}
+      {{ {'kacheln': ns.kacheln,
+          'heute': ns.heute,
+          'morgen': ns.morgen,
+          'zentral': (teile | join(' · ')) if teile else 'kein Termin'} | tojson }}
+- repeat:
+    for_each: '{{ lage.kacheln }}'
+    sequence:
+    - action: loxone.event_websocket_command
+      data:
+        uuid: '{{ repeat.item.uuid }}'
+        value: '{{ repeat.item.text }}'
+      continue_on_error: true
+- action: loxone.event_websocket_command
+  data:
+    uuid: <LOXONE_UUID_ZENTRAL>
+    value: '{{ lage.zentral }}'
+  continue_on_error: true
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ (trigger.id | default('''')) == ''abend'' and lage.morgen | length > 0 }}'
+    sequence:
+    - action: loxone.event_websocket_command
+      data:
+        uuid: <LOXONE_UUID_MITTEILUNG>
+        value: 'Morgen: {{ lage.morgen | join('', '') }} – bitte rausstellen'
+  - conditions:
+    - condition: template
+      value_template: '{{ (trigger.id | default('''')) == ''frueh'' and lage.heute | length > 0 }}'
+    sequence:
+    - action: loxone.event_websocket_command
+      data:
+        uuid: <LOXONE_UUID_MITTEILUNG>
+        value: 'Heute: {{ lage.heute | join('', '') }} – noch rausstellen, falls vergessen'
+mode: single

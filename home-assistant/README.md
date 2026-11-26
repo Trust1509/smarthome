@@ -46,6 +46,10 @@ Receives commands from Loxone on topic `lox/Somfy/set` and controls the correspo
 - `{"cmd":"Stop","shades":[1]}` — stops selected shutters
 - `{"cmd":"Position","shades":{"1":30,"2":80}}` — moves shutters to position
 
+### `automations/waste_collection_loxone.yaml`
+
+Writes the next waste collection dates from a Local Calendar into Loxone virtual text inputs via PyLoxone (`loxone.event_websocket_command`), one tile per waste type plus a today/tomorrow status. It also triggers a Loxone push at 18:00 (collection tomorrow) and 06:00 (collection today). For setup and the yearly calendar import, see [`waste-calendar/README.md`](waste-calendar/README.md).
+
 ## Deployment
 
 1. In Home Assistant, go to **Settings → Automations**.
