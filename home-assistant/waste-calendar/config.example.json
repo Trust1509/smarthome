@@ -1,0 +1,19 @@
+{
+  "header_row": 2,
+  "columns": [
+    { "index": 1, "header": "Restmüll Sprengel 2", "title": "Restmüll" },
+    { "index": 5, "header": "Bio Sprengel 2", "title": "Biotonne" },
+    { "index": 3, "header": "Altpapier Sprengel 2", "title": "Altpapier" },
+    { "index": 6, "header": "Gelber Sack Sprengel 1 + 2", "title": "Gelber Sack" },
+    { "index": 8, "header": "Restmüll", "title": "Windeltonne" }
+  ],
+  "summary_prefix": "🗑 ",
+  "timezone": "Europe/Vienna",
+  "start": "060000",
+  "end": "220000",
+  "description": "Tonne ab 06:00 Uhr bereitstellen, Abholung bis 22:00 Uhr.",
+  "category": "Müllabfuhr",
+  "alarm_trigger": "-PT14H",
+  "alarm_text": "{title} morgen rausstellen!",
+  "uid_domain": "example.invalid"
+}
